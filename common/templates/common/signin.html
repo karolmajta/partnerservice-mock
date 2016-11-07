@@ -10,7 +10,10 @@
     <hr>
     <p>
         We try to simulate some flow through docomo, so please use this link:
-        <a href="{% url "common.signin_continue" %}">to go further</a> in docomo login flow.
+        <a href="{% url "common.signin_continue" %}?redirect_uri={{ redirect_uri | urlencode }}&state={{ state }}">
+          to go further
+        </a>
+        in docomo login flow.
     </p>
 </body>
 </html>

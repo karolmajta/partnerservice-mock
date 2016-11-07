@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+    <h1>Continue signin</h1>
+    <hr>
+        <p>Use <em>docomo/docomo</em> for successful login. Otherwise will fail.</p>
+    <hr>
+    <form method="POST" action={% url "common.signin_process" %}>
+        {% csrf_token %}
+        <div>
+           <label for="username">username</div>
+           <input type="text" name="username" />
+        </div>
+        <div>
+           <label for="password">password</div>
+           <input type="password" name="password" />
+        </div>
+        <div>
+           <button type="submit">Login</button>
+        </div>
+    <form>
+</body>
+</html>
+

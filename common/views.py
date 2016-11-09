@@ -1,3 +1,5 @@
+import re
+
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST, require_GET
 from django.shortcuts import render
@@ -19,6 +21,7 @@ ALLOWED_REDIRECT_URIS = {
     "stag.dazn.com/account/last-step",
     "test.dazn.com/account/last-step"
 }
+LOCALHOST_REGEX = r'^localhost([:]{0,1})(\d*)/account/last-step$'
 
 @require_GET
 def signin(request):
@@ -29,8 +32,8 @@ def signin(request):
     if request.GET['client_id'] != CLIENT_ID:
         msg = u"Invalid client_id, for testing use `{0}`".format(CLIENT_ID)
         return HttpResponse(msg, status=400) 
-    if request.GET['redirect_uri'] not in ALLOWED_REDIRECT_URIS:
-        msg = u"Invalid redirect_uri, should be one of `{0}`".format(list(ALLOWED_REDIRECT_URIS))
+    if request.GET['redirect_uri'] not in ALLOWED_REDIRECT_URIS and not re.match(LOCALHOST_REGEX, request.GET['redirect_uri']):
+        msg = u"Invalid redirect_uri, should be one of `{0}` or localhost<:*>/account/last-step.".format(list(ALLOWED_REDIRECT_URIS))
         return HttpResponse(msg, status=400)
     if request.GET['response_type'] != RESPONSE_TYPE:
         msg = u"Invalid response_type, should be `{0}`".format(RESPONSE_TYPE)

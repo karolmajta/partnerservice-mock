@@ -32,7 +32,10 @@ def signin(request):
     if request.GET['client_id'] != CLIENT_ID:
         msg = u"Invalid client_id, for testing use `{0}`".format(CLIENT_ID)
         return HttpResponse(msg, status=400) 
-    if request.GET['redirect_uri'] not in ALLOWED_REDIRECT_URIS and not re.match(LOCALHOST_REGEX, request.GET['redirect_uri']):
+    redirect_uri = request.GET['redirect_uri']
+    redirect_uri_is_production = redirect_uri in ALLOWED_REDIRECT_URIS
+    redirect_uri_is_development = re.match(LOCALHOST_REGEX, redirect_uri)
+    if redirect_uri_is_production and not redirect_uri_is_development:
         msg = u"Invalid redirect_uri, should be one of `{0}` or localhost<:*>/account/last-step.".format(list(ALLOWED_REDIRECT_URIS))
         return HttpResponse(msg, status=400)
     if request.GET['response_type'] != RESPONSE_TYPE:
@@ -40,8 +43,9 @@ def signin(request):
         return HttpResponse(msg, status=400) 
     if request.GET['authif'] != AUTHIF:
         msg = u"Invalid autif, should be `{0}`".format(AUTHIF)
+    scheme = "http" if redirect_uri_is_development else "https"
     return render(request, 'common/signin.html', {
-        'redirect_uri': request.GET['redirect_uri'],
+        'redirect_uri': "{0}://{1}".format(scheme, redirect_uri),
         'state': request.GET['state']
     })
 
@@ -58,9 +62,9 @@ def signin_process(request):
     redirect_uri = request.POST['redirect_uri']
     state = request.POST['state']
     if request.POST['username'] == "docomo" and request.POST['password'] == "docomo":
-        response['Location'] = "https://{0}?code={1}&state={2}".format(redirect_uri, "12345", state)
+        response['Location'] = "{0}?code={1}&state={2}".format(redirect_uri, "12345", state)
     else:
-        response['Location'] = "https://{0}?error={1}".format(redirect_uri, "something-very-wrong")
+        response['Location'] = "{0}?error={1}".format(redirect_uri, "something-very-wrong")
     return response
 
 @require_GET

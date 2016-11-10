@@ -1,6 +1,9 @@
+import base64
 import re
+import uuid
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 from django.shortcuts import render
 
@@ -14,7 +17,9 @@ REQUIRED_SIGNIN_QUERY_PARAMS = {
     'authif',
 }
 CLIENT_ID = "s6BhdRkqt3"
+CLIENT_SECRET = "12345"
 RESPONSE_TYPE = "code"
+GRANT_TYPE = "authorization_code"
 AUTHIF = "0"
 ALLOWED_REDIRECT_URIS = {
     "www.dazn.com/account/last-step",
@@ -80,3 +85,29 @@ def signup_process(request):
     response = HttpResponse("", status=302)
     response['Location'] = 'https://dazn.com/docomo/'
     return response
+
+@csrf_exempt
+@require_POST
+def token(request):
+    if request.META.get('HTTP_AUTHORIZATION', None) != 'Basic {0}'.format(base64.b64encode(CLIENT_ID + CLIENT_SECRET)):
+        msg = u"Invalid `Authorization` header"
+        return HttpResponse(msg, status=401)
+    if request.POST.get('grant_type', None) != GRANT_TYPE:
+        msg = u"`grant_type` parameter should be `{0}`".format(GRANT_TYPE)
+        return HttpResponse(msg, status=400)
+    if not request.POST.get('code', None) or len(request.POST['code']) != 5:
+        msg = u"invalid `code` parameter"
+        return HttpResponse(msg, status=401)
+    redirect_uri = request.POST.get('redirect_uri', "")
+    redirect_uri_is_production = redirect_uri in ALLOWED_REDIRECT_URIS
+    redirect_uri_is_development = re.match(LOCALHOST_REGEX, redirect_uri)
+    if redirect_uri_is_production and not redirect_uri_is_development:
+        msg = u"Invalid redirect_uri, should be one of `{0}` or localhost<:*>/account/last-step.".format(list(ALLOWED_REDIRECT_URIS))
+        return HttpResponse(msg, status=400)
+    return JsonResponse({
+        'access_token': str(uuid.uuid4()),
+        'token_type': "Bearer",
+        'expires_in': 90*24*60*60,
+        'scope': '',
+        'id_token': str(uuid.uuid4())
+    })

@@ -25,4 +25,5 @@ urlpatterns = [
     url(r'^signup/$', views.signup, name="common.signup"),
     url(r'^signup-continue/$', views.signup_continue, name="common.signup_continue"),
     url(r'^signup-process/$', views.signup_process, name="common.signup_process"),
+    url(r'^token/$', views.token, name='common.token'),
 ]

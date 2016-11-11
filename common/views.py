@@ -40,7 +40,7 @@ def signin(request):
     redirect_uri = request.GET['redirect_uri']
     redirect_uri_is_production = redirect_uri in ALLOWED_REDIRECT_URIS
     redirect_uri_is_development = re.match(LOCALHOST_REGEX, redirect_uri)
-    if redirect_uri_is_production and not redirect_uri_is_development:
+    if not redirect_uri_is_production and not redirect_uri_is_development:
         msg = u"Invalid redirect_uri, should be one of `{0}` or localhost<:*>/account/last-step.".format(list(ALLOWED_REDIRECT_URIS))
         return HttpResponse(msg, status=400)
     if request.GET['response_type'] != RESPONSE_TYPE:
@@ -101,7 +101,7 @@ def token(request):
     redirect_uri = request.POST.get('redirect_uri', "")
     redirect_uri_is_production = redirect_uri in ALLOWED_REDIRECT_URIS
     redirect_uri_is_development = re.match(LOCALHOST_REGEX, redirect_uri)
-    if redirect_uri_is_production and not redirect_uri_is_development:
+    if not redirect_uri_is_production and not redirect_uri_is_development:
         msg = u"Invalid redirect_uri, should be one of `{0}` or localhost<:*>/account/last-step.".format(list(ALLOWED_REDIRECT_URIS))
         return HttpResponse(msg, status=400)
     return JsonResponse({

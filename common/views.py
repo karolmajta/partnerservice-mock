@@ -40,7 +40,7 @@ def signin(request):
         return HttpResponse(msg, status=400) 
     redirect_uri = request.GET['redirect_uri']
     redirect_uri_is_production = redirect_uri in ALLOWED_REDIRECT_URIS
-    redirect_uri_is_development = re.match(LOCALHOST_REGEX, redirect_uri)
+    redirect_uri_is_development = True # re.match(LOCALHOST_REGEX, redirect_uri)
     if not redirect_uri_is_production and not redirect_uri_is_development:
         msg = u"Invalid redirect_uri, should be one of `{0}` or localhost<:*>/account/last-step.".format(list(ALLOWED_REDIRECT_URIS))
         return HttpResponse(msg, status=400)
@@ -49,7 +49,7 @@ def signin(request):
         return HttpResponse(msg, status=400) 
     if request.GET['authif'] != AUTHIF:
         msg = u"Invalid autif, should be `{0}`".format(AUTHIF)
-    scheme = "http" if redirect_uri_is_development else "https"
+    scheme = "http" if not redirect_uri_is_production else "https"
     return render(request, 'common/signin.html', {
         'redirect_uri': "{0}://{1}".format(scheme, redirect_uri),
         'state': request.GET['state']
@@ -101,7 +101,7 @@ def token(request):
         return HttpResponse(msg, status=401)
     redirect_uri = request.POST.get('redirect_uri', "")
     redirect_uri_is_production = redirect_uri in ALLOWED_REDIRECT_URIS
-    redirect_uri_is_development = re.match(LOCALHOST_REGEX, redirect_uri)
+    redirect_uri_is_development = True # re.match(LOCALHOST_REGEX, redirect_uri)
     if not redirect_uri_is_production and not redirect_uri_is_development:
         msg = u"Invalid redirect_uri, should be one of `{0}` or localhost<:*>/account/last-step.".format(list(ALLOWED_REDIRECT_URIS))
         return HttpResponse(msg, status=400)

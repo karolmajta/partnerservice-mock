@@ -22,6 +22,7 @@ RESPONSE_TYPE = "code"
 GRANT_TYPE = "authorization_code"
 AUTHIF = "0"
 ALLOWED_REDIRECT_URIS = {
+    "dazn.com/account/last-step",
     "www.dazn.com/account/last-step",
     "stag.dazn.com/account/last-step",
     "test.dazn.com/account/last-step"

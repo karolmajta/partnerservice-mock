@@ -70,7 +70,7 @@ def signin_process(request):
     if request.POST['username'] == "docomo" and request.POST['password'] == "docomo":
         response['Location'] = "{0}?code={1}&state={2}".format(redirect_uri, "12345", state)
     else:
-        response['Location'] = "{0}?error={1}".format(redirect_uri, "something-very-wrong")
+        response['Location'] = "{0}?error={1}&state={2}".format(redirect_uri, "something-very-wrong", state)
     return response
 
 @require_GET
